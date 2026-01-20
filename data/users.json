@@ -1,0 +1,39 @@
+{
+  "teachers": [
+    {
+      "id": "475ec20c-40ec-49c9-9d1f-7374ec3e5bfc",
+      "login": "admin1",
+      "password": "admin1",
+      "students": []
+    },
+    {
+      "id": "6ad0e2c9-95ce-46ec-982d-c0bef94b82aa",
+      "login": "admin",
+      "password": "admin",
+      "students": []
+    }
+  ],
+  "students": [
+    {
+      "id": "e43ce612-34de-4f6b-812d-143bb3f158be",
+      "name": "Ylus",
+      "login": "student_c7614",
+      "password": "a530",
+      "teacher_id": "6ad0e2c9-95ce-46ec-982d-c0bef94b82aa"
+    },
+    {
+      "id": "a5b6cc7f-e421-4d21-9714-b630539b47cb",
+      "name": "222",
+      "login": "student_9d6ea",
+      "password": "82f2",
+      "teacher_id": "6ad0e2c9-95ce-46ec-982d-c0bef94b82aa"
+    },
+    {
+      "id": "7453e17a-2f00-47f9-a32f-143eb45cbe36",
+      "name": "333",
+      "login": "student_6b58c",
+      "password": "71f1",
+      "teacher_id": "6ad0e2c9-95ce-46ec-982d-c0bef94b82aa"
+    }
+  ]
+}

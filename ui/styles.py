@@ -1,0 +1,5 @@
+BG_MAIN = "#1e1e2f"
+BG_PANEL = "#2a2a40"
+BTN_MAIN = "#4f46e5"
+BTN_HOVER = "#6366f1"
+TEXT_COLOR = "#ffffff"
