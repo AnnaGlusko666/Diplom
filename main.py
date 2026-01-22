@@ -8,18 +8,15 @@ from ui.teacher_students import teacher_students
 from ui.student_panel import student_panel
 
 
-def open_teacher_panel(teacher):
-    clear()
-    teacher_panel(root, teacher, lambda: open_teacher_students(teacher))
-
-def open_teacher_students(teacher):
-    clear()
-    teacher_students(root, teacher, lambda: open_teacher_panel(teacher))
-
-
 root = tk.Tk()
 root.title("Електронний журнал")
-root.geometry("500x400")
+
+root.state("zoomed")  # Windows / Linux
+
+root.configure(bg="black")  # щоб не було білих миготінь
+
+
+
 
 
 def clear():
@@ -27,14 +24,20 @@ def clear():
         w.destroy()
 
 
-def open_login(role):
+# ✅ ПОВЕРНЕННЯ НА ЕКРАН ВИБОРУ РОЛІ
+def show_role_select():
     clear()
-    login_screen(root, role, open_panel, open_register)
+    role_screen(root, open_login)
 
 
-def open_register():
+def open_teacher_panel(teacher):
     clear()
-    register_teacher_screen(root, lambda: open_login("teacher"))
+    teacher_panel(root, teacher, lambda: open_teacher_students(teacher))
+
+
+def open_teacher_students(teacher):
+    clear()
+    teacher_students(root, teacher, lambda: open_teacher_panel(teacher))
 
 
 def open_panel(role, user):
@@ -45,6 +48,21 @@ def open_panel(role, user):
         student_panel(root, user)
 
 
+# ✅ show_role_select — це callback для кнопки "Назад"
+def open_login(role, back_to_roles=None):
+    clear()
+    if back_to_roles is None:
+        back_to_roles = show_role_select  # дефолтно "Назад" веде на role_screen
 
-role_screen(root, open_login)
+    login_screen(root, role, open_panel, open_register, back_to_roles)
+
+
+def open_register():
+    clear()
+    # ✅ Назад з реєстрації повертає на логін вчителя
+    register_teacher_screen(root, lambda: open_login("teacher", show_role_select))
+
+
+# ✅ стартова сторінка
+show_role_select()
 root.mainloop()
