@@ -34,6 +34,13 @@
       "login": "student_6b58c",
       "password": "71f1",
       "teacher_id": "6ad0e2c9-95ce-46ec-982d-c0bef94b82aa"
+    },
+    {
+      "id": "60a94f5b-b443-4760-9167-789ec462453a",
+      "name": "",
+      "login": "student_ae09b",
+      "password": "95f8",
+      "teacher_id": "475ec20c-40ec-49c9-9d1f-7374ec3e5bfc"
     }
   ]
 }
