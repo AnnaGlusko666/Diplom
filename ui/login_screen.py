@@ -1,183 +1,110 @@
 import tkinter as tk
-from services.user_service import auth_teacher, auth_student
-from ui.styles import (
-    BG_MAIN,
-    BG_PANEL,
-    TEXT_COLOR,
-    BTN_MAIN,
-    BTN_HOVER,
-    ui_button,
-    ui_back_button,
-)
-from ui.background import create_background
+from tkinter import messagebox
+
+from ui.styles import BG_PANEL, TEXT_COLOR, BTN_MAIN, ui_button, ui_back_button
 
 
-def styled_entry(parent, is_password=False):
-    entry = tk.Entry(
-        parent,
-        bd=0,
-        relief="flat",
-        highlightthickness=2,
-        highlightbackground="#3b3b55",
-        highlightcolor=BTN_MAIN,
-        bg="white",
-        fg="#111827",
-        font=("Arial", 12),
-    )
-    if is_password:
-        entry.config(show="•")
-    return entry
-
-
-def login_screen(
-    root,
-    role: str,
-    open_panel,
-    open_register,
-    back_to_roles,
-):
-    # Очистити root
+def login_screen(root, role, on_panel, on_register, back_to_roles):
+    # очистити root
     for w in root.winfo_children():
         w.destroy()
 
-    # Фон
-    outer = create_background(root)
+    # фон
+    frame = tk.Frame(root, bg=BG_PANEL)
+    frame.pack(fill="both", expand=True)
 
-    card = tk.Frame(outer, bg=BG_PANEL, padx=50, pady=40)
-    card_window = outer.create_window(0, 0, window=card, anchor="center")
+    # центрування
+    frame.grid_rowconfigure(0, weight=1)
+    frame.grid_columnconfigure(0, weight=1)
 
-    def center_card(event):
-        outer.coords(card_window, event.width // 2, event.height // 2)
+    # ✅ wrapper — центр
+    wrapper = tk.Frame(frame, bg=BG_PANEL)
+    wrapper.grid(row=0, column=0)
 
-    outer.bind("<Configure>", center_card)
+    # ✅ box — фіксована ширина
+    box = tk.Frame(wrapper, bg=BG_PANEL)
+    box.pack()
 
-    outer.grid_rowconfigure(0, weight=1)
-    outer.grid_columnconfigure(0, weight=1)
+    # задаємо ширину через "порожні" колонки (стабільно для Tk)
+    box.grid_columnconfigure(0, minsize=520)  # ⬅️ ширина форми
 
-    # Картка
-    card = tk.Frame(outer, bg=BG_PANEL, padx=40, pady=32)
-    card.grid(row=0, column=0)
+    # Контент кладемо у grid, щоб усе тягнулось по ширині
+    back_btn = ui_back_button(box, "Назад", back_to_roles)
+    back_btn.grid(row=0, column=0, sticky="w", pady=(0, 18))
 
-    # ===== ROW 0 — НАЗАД =====
-    back_btn = ui_back_button(card, "Назад", back_to_roles)
-    back_btn.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 18))
-
-    # ===== ROW 1 — ЗАГОЛОВОК =====
     title = tk.Label(
-        card,
-        text="Вхід",
-        bg=BG_PANEL,
-        fg=TEXT_COLOR,
-        font=("Arial", 22, "bold"),
+        box, text="Вхід",
+        bg=BG_PANEL, fg=TEXT_COLOR,
+        font=("Arial", 40, "bold"),
     )
-    title.grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 24))
+    title.grid(row=1, column=0, sticky="w", pady=(0, 24))
 
-    # ===== ROW 2 — ЛОГІН (LABEL) =====
-    tk.Label(
-        card,
-        text="Логін",
-        bg=BG_PANEL,
-        fg=TEXT_COLOR,
-        font=("Arial", 12),
-    ).grid(row=2, column=0, columnspan=2, sticky="w")
+    if role == "teacher":
+        reg_btn = ui_button(box, "Реєстрація вчителя", on_register, primary=False)
+        reg_btn.grid(row=8, column=0, sticky="we", pady=(12, 0), ipady=4)
 
-    # ===== ROW 3 — ЛОГІН (ENTRY) =====
-    login_entry = styled_entry(card)
-    login_entry.grid(
-        row=3,
-        column=0,
-        columnspan=2,
-        sticky="we",
-        pady=(8, 20),
+    # helper entry
+    def styled_entry(parent, show=None):
+        e = tk.Entry(
+            parent,
+            bd=0,
+            relief="flat",
+            highlightthickness=2,
+            highlightbackground="#3b3b55",
+            highlightcolor=BTN_MAIN,
+            bg="white",
+            fg="#111827",
+            font=("Arial", 16),
+        )
+        if show:
+            e.config(show=show)
+        return e
+
+    tk.Label(box, text="Логін", bg=BG_PANEL, fg=TEXT_COLOR, font=("Arial", 21)).grid(
+        row=2, column=0, sticky="w"
     )
+    login_entry = styled_entry(box)
+    login_entry.grid(row=3, column=0, sticky="we", pady=(8, 18), ipady=10)
 
-    # ===== ROW 4 — ПАРОЛЬ (LABEL) =====
-    tk.Label(
-        card,
-        text="Пароль",
-        bg=BG_PANEL,
-        fg=TEXT_COLOR,
-        font=("Arial", 12),
-    ).grid(row=4, column=0, columnspan=2, sticky="w")
-
-    # ===== ROW 5 — ПАРОЛЬ (ENTRY + CHECKBOX) =====
-    password_entry = styled_entry(card, is_password=True)
-    password_entry.grid(row=5, column=0, sticky="we", pady=(8, 10))
+    tk.Label(box, text="Пароль", bg=BG_PANEL, fg=TEXT_COLOR, font=("Arial", 21)).grid(
+        row=4, column=0, sticky="w"
+    )
+    pass_entry = styled_entry(box, show="•")
+    pass_entry.grid(row=5, column=0, sticky="we", pady=(8, 10), ipady=10)
 
     show_pwd = tk.BooleanVar(value=False)
 
-    def toggle_password():
-        password_entry.config(show="" if show_pwd.get() else "•")
+    def toggle_pwd():
+        pass_entry.config(show="" if show_pwd.get() else "•")
 
-    toggle = tk.Checkbutton(
-        card,
-        text="Показати",
+    chk = tk.Checkbutton(
+        box,
+        text="Показати пароль",
         variable=show_pwd,
-        command=toggle_password,
+        command=toggle_pwd,
         bg=BG_PANEL,
         fg=TEXT_COLOR,
         activebackground=BG_PANEL,
         activeforeground=TEXT_COLOR,
         selectcolor=BG_PANEL,
         bd=0,
+        font=("Arial", 15),
         cursor="hand2",
-        font=("Arial", 11),
     )
-    toggle.grid(row=5, column=1, sticky="e", padx=(14, 0))
-
-    # ===== ROW 6 — ПОМИЛКА =====
-    error_lbl = tk.Label(
-        card,
-        text="",
-        bg=BG_PANEL,
-        fg="#fca5a5",
-        font=("Arial", 11),
-    )
-    error_lbl.grid(row=6, column=0, columnspan=2, sticky="w", pady=(0, 16))
-
-    # ===== ROW 7 — КНОПКИ =====
-    btns = tk.Frame(card, bg=BG_PANEL)
-    btns.grid(row=7, column=0, columnspan=2, sticky="we")
+    chk.grid(row=6, column=0, sticky="w", pady=(0, 18))
 
     def do_login():
-        error_lbl.config(text="")
-
         login = login_entry.get().strip()
-        password = password_entry.get()
+        password = pass_entry.get()
 
-        if not login:
-            error_lbl.config(text="Введіть логін.")
+        if not login or not password:
+            messagebox.showwarning("Помилка", "Введіть логін і пароль.")
             return
 
-        if not password:
-            error_lbl.config(text="Введіть пароль.")
-            return
+        # тут твоя реальна логіка входу має бути
+        on_panel(role, {"login": login, "password": password})
 
-        if role == "teacher":
-            user = auth_teacher(login, password)
-        else:
-            user = auth_student(login, password)
-
-        if not user:
-            error_lbl.config(text="Невірний логін або пароль.")
-            return
-
-        open_panel(role, user)
-
-    login_btn = ui_button(btns, "Увійти", do_login, primary=True)
-    login_btn.pack(fill="x")
-
-    if role == "teacher":
-        reg_btn = ui_button(
-            btns,
-            "Реєстрація вчителя",
-            open_register,
-            primary=False,
-        )
-        reg_btn.pack(fill="x", pady=(14, 0))
-
-    # ===== GRID CONFIG =====
-    card.grid_columnconfigure(0, weight=1)
-    card.grid_columnconfigure(1, weight=0)
+    btn = ui_button(box, "Увійти", do_login, primary=True)
+    btn.grid(row=7, column=0, sticky="we", ipady=4, pady=(10, 0))
 
     login_entry.focus_set()
