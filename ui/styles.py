@@ -8,35 +8,37 @@ TEXT_COLOR = "#ffffff"
 
 def ui_button(parent, text, command, primary=True):
     bg = BTN_MAIN if primary else "#3b3b55"
-    hover = BTN_HOVER if primary else "#4b4b6a"
+    hover_bg = BTN_HOVER if primary else "#4b4b6a"
+    fg = "white"
 
     btn = tk.Frame(
         parent,
         bg=bg,
-        height=46,
         cursor="hand2",
+        highlightthickness=0,
     )
-    btn.pack_propagate(False)
 
     lbl = tk.Label(
         btn,
         text=text,
         bg=bg,
-        fg="white",
-        font=("Arial", 12, "bold"),
+        fg=fg,
+        font=("Arial", 20, "bold"),  # ⬅️ БІЛЬШИЙ ТЕКСТ
+        pady=14                     # ⬅️ ВИСОТА КНОПКИ
     )
-    lbl.pack(expand=True)
+    lbl.pack(fill="x")
 
     def on_enter(_):
-        btn.config(bg=hover)
-        lbl.config(bg=hover)
+        btn.config(bg=hover_bg)
+        lbl.config(bg=hover_bg)
 
     def on_leave(_):
         btn.config(bg=bg)
         lbl.config(bg=bg)
 
     def on_click(_):
-        command()
+        if callable(command):
+            command()
 
     for w in (btn, lbl):
         w.bind("<Enter>", on_enter)
@@ -44,6 +46,7 @@ def ui_button(parent, text, command, primary=True):
         w.bind("<Button-1>", on_click)
 
     return btn
+
 
 
 def ui_back_button(parent, text, command):
@@ -58,7 +61,7 @@ def ui_back_button(parent, text, command):
         text=f"← {text}",
         bg=bg,
         fg=normal_fg,
-        font=("Arial", 11, "bold"),
+        font=("Arial", 20, "bold"),
     )
     lbl.pack()
 
